@@ -16,7 +16,7 @@ oc new-project $PROJECT
 oc project $PROJECT
 
 echo "Creating the installation directory - in general /tmp/cp4x" 
-export DIR_CP4X_INST=/tmp/$PROJECT
+export DIR_CP4X_INST=/tmp/CP4X
 echo $DIR_CP4X_RWX
 
 echo "Discovering IPs" 
