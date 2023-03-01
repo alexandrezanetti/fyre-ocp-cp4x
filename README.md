@@ -13,25 +13,32 @@ This git is part of  instructions available on https://w3.ibm.com/w3publisher/pr
 > git --version
 
 #### 3. Baixar o script / Clone git with scripts
-> git clone https://github.com/alexandrezanetti/fyre-ocp-cp4x.git
+> git clone https://github.com/alexandrezanetti/turbonomic.git
 
 #### 4. Se tiver interesse, visualizar o conteúdo do Script / Look the content
-> cat /root/fyre-ocp-cp4x/zzzPreparation.sh
+> cat /root/turbonomic/t8c-certified-operator.yaml<br>
+> cat /root/turbonomic/t8c-certified-sub.yaml
 
 #### 5. Criar o novo arquivo/script que será ajustado / create a new script to be changed
-> touch /root/fyre-ocp-cp4x/zzzPreparationOK.sh<br>
-> chmod 777 /root/fyre-ocp-cp4x/zzzPreparationOK.sh
+> touch /root/turbonomic/t8c-certified-operator_OK.yaml<br>
+> touch /root/turbonomic/t8c-certified-sub_OK.yaml<br>
+> chmod 777 /root/turbonomic/t8c-certified-operator_OK.yaml<br>
+> chmod 777 /root/turbonomic/t8c-certified-sub_OK.yaml
 
 #### 6. Muito importante: Setar estas variáveis / Must important! Define project name and set your IBM Entitlement Key
-> PROJECT=CP4?<br>
+> PROJECT=turbomonic<br>
 > IBMENTITLEMENTKEY=???<br>
 > echo $PROJECT<br>
 > echo $IBMENTITLEMENTKEY
 
 #### 7. Ajustar o arquivo com Projeto/EntitlementKey / Run the command below to adjust Project and EntitlementKey
-> cat /root/fyre-ocp-cp4x/zzzPreparation.sh | sed "s/={###PROVIDE_YOUR_IBM_ENTITLEMENT_KEY_HERE###}/=$IBMENTITLEMENTKEY/g" | sed "s/={###PROVIDE_YOUR_PROJECT_NAMESPACE_CP4X_HERE###}/=$PROJECT/g" >/root/fyre-ocp-cp4x/zzzPreparationOK.sh
+> cat /root/turbonomic/t8c-certified-sub.yaml | sed "s/{###PROVIDE_YOUR_PROJECT_NAMESPACE_CP4X_HERE###}/$PROJECT/g" >/root/turbonomic/t8c-certified-sub_OK.yaml<br>
+> cat /root/turbonomic/t8c-certified-operator.yaml | sed "s/{###PROVIDE_YOUR_PROJECT_NAMESPACE_CP4X_HERE###}/$PROJECT/g" >/root/turbonomic/t8c-certified-operator_OK.yaml
 
-#### 8. E finalmente, execute o script / And finally, run the script
-> /root/fyre-ocp-cp4x/./zzzPreparationOK.sh
+#### 8. Execute o script / And finally, run the script
+> oc apply -f /root/turbonomic/t8c-certified-operator_OK.yaml<br>
+> oc apply -f /root/turbonomic/t8c-certified-sub_OK.yaml
 
-#### Observação! No final mostrará o tempo de início e o final da execução. / At the end you will see the time lapsed from this execution.
+#### 9. E finalmente, acompanhe o pod ser restatado
+oc get pods -n openshift-marketplace -w | grep operators
+
