@@ -2,6 +2,8 @@
 
 This git is part of  instructions available on https://w3.ibm.com/w3publisher/preparing-fyre-for-cloud-pak-cp4x
 
+We follow this site to help us: https://www.ibm.com/docs/en/ibm-mq/9.3?topic=iumorho-installing-mq-operator-using-red-hat-openshift-cli
+
 #### 1. Entrar no Bastion do cluster OCP através de terminal (SSH) / Open Bastion of OCP cluster using terminal SSH
 > Lembre-se que precisará das informações abaixo/ Note that you will use the informations below:<br>
 > - Bastion IP Publico / Bastion public IP<br>
