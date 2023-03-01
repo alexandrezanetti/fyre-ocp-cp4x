@@ -1,4 +1,4 @@
-# Preparando o cluster Openshift (OCP) no ambiente Fyre para Cloud Pak (CP4x) e demais produtos / Preparying  Openshift (OCP) cluster on Fyre environment for Cloud Pak (CP4x) and beyond
+# Preparando o cluster Openshift (OCP) no ambiente Fyre para Cloud Pak (CP4x) e demais produtos / Preparing  Openshift (OCP) cluster on Fyre environment for Cloud Pak (CP4x) and beyond
 
 This git is part of  instructions available on https://w3.ibm.com/w3publisher/preparing-fyre-for-cloud-pak-cp4x
 
