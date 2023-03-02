@@ -10,7 +10,7 @@ This git is part of  instructions available on https://w3.ibm.com/w3publisher/pr
 
 #### 2. Instalar o GIT no bastion / Instal GIT on Bastion:
 ```
-sudo dnf install -y git<br>
+sudo dnf install -y git
 ```
 
 #### 3. Baixar o script / Clone git with scripts
