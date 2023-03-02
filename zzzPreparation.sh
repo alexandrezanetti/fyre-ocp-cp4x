@@ -5,11 +5,9 @@ export START=$(date)
 
 echo "Check your IBM Entitlement Key - https://myibm.ibm.com/products-services/containerlibrary" 
 echo $IBMENTITLEMENTKEY
-export IBMENTITLEMENTKEY={###PROVIDE_YOUR_IBM_ENTITLEMENT_KEY_HERE###}
 if [ ${IBMENTITLEMENTKEY} = "{###PROVIDE_YOUR_IBM_ENTITLEMENT_KEY_HERE###}" ]; then echo "Please provide your IBM Entitlement Key - Check https://myibm.ibm.com/products-services/containerlibrary"; exit 999; fi
 
 echo "Check your Project (Namespace) name" 
-export PROJECT={###PROVIDE_YOUR_PROJECT_NAMESPACE_CP4X_HERE###}
 if [ ${PROJECT} = "{###PROVIDE_YOUR_PROJECT_NAMESPACE_CP4X_HERE###}" ]; then echo "Please provide your Project/Namespace (CP4x)"; exit 999; fi
 PROJECT=$(echo $PROJECT | tr A-Z a-z)
 echo $PROJECT
