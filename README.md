@@ -19,6 +19,9 @@ git clone https://github.com/alexandrezanetti/fyre-ocp-cp4x.git
 ```
 
 #### 4. E finalmente, execute o script / And finally, run the script
+Preencha os conteudos abaixo:
+PROJECT={###PROVIDE_YOUR_PROJECT_NAMESPACE_CP4X_HERE###}
+IBMENTITLEMENTKEY{###PROVIDE_YOUR_IBM_ENTITLEMENT_KEY_HERE###}
 ```
 export PROJECT={###PROVIDE_YOUR_PROJECT_NAMESPACE_CP4X_HERE###} ; export IBMENTITLEMENTKEY{###PROVIDE_YOUR_IBM_ENTITLEMENT_KEY_HERE###} ; chmod a+x /root/fyre-ocp-cp4x/zzzPreparation.sh ; /root/fyre-ocp-cp4x/./zzzPreparation.sh
 ```
