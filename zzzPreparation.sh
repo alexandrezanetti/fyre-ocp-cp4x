@@ -174,6 +174,32 @@ oc patch storageclass rook-cephfs -p '{"metadata": {"annotations":{"storageclass
 oc create -f toolbox.yaml
 oc patch storageclass rook-ceph-block -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
 
+
+cat <<EOF >> $DIR_CP4X_INST/ibmintranetoauth.yaml
+apiVersion: config.openshift.io/v1
+kind: OAuth
+metadata:
+  name: cluster
+spec:
+  identityProviders:
+    - mappingMethod: claim
+      name: IBM W3 intranet login
+      type: LDAP
+      ldap:
+        attributes:
+          email:
+            - emailAddress
+          id:
+            - dn
+          name:
+            - cn
+          preferredUsername:
+            - emailAddress
+        insecure: false
+        url: "ldaps://bluepages.ibm.com:636/ou=bluepages,o=ibm.com?emailAddress?sub?(objectclass=ePerson)"
+EOF
+oc apply -f $DIR_CP4X_INST/ibmintranetoauth.yaml
+        
 echo "###### FINISH - ZZZ SCRIPT - PREPARING OPENSHIFT (OCP) ON FYRE TO INSTALL CLOUD PAK FOR X (CP4X)"
 export STOP=$(date)
 echo "###### START: "$START " - STOP: "$STOP" ###### "
