@@ -3,6 +3,16 @@
 echo "###### START - ZZZ SCRIPT - PREPARING OPENSHIFT (OCP) ON FYRE TO INSTALL CLOUD PAK FOR X (CP4X)"
 export START=$(date)
 
+yum install openldap-clients -y
+
+echo "Por favor informe seu email:"
+read email
+manager=ldapsearch -x -H ldaps://bluepages.ibm.com:636 -b "c=br,ou=bluepages,o=ibm.com" -s sub "(emailAddress=$email)" | grep "manager: uid="
+
+ldapsearch -x -H ldaps://bluepages.ibm.com:636 -b "c=br,ou=bluepages,o=ibm.com" -s sub "(managerSerialNumber=$manager)" | grep "emailAddress:"  | grep -v "BR0\|BR-" | grep "@"
+
+pause
+
 echo "Check your IBM Entitlement Key - https://myibm.ibm.com/products-services/containerlibrary" 
 echo $IBMENTITLEMENTKEY
 if [ ${IBMENTITLEMENTKEY} = "{###PROVIDE_YOUR_IBM_ENTITLEMENT_KEY_HERE###}" ]; then echo "Please provide your IBM Entitlement Key - Check https://myibm.ibm.com/products-services/containerlibrary"; exit 999; fi
