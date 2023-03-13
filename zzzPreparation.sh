@@ -96,8 +96,8 @@ do
         echo "oc create useridentitymapping "${identity}" ${email}"
         oc create useridentitymapping "${identity}" ${email}
 
-        echo "oc adm policy add-role-to-user cluster-admin ${email}"
-        oc adm policy add-role-to-user cluster-admin ${email}
+        echo "oc adm policy add-cluster-role-to-user cluster-admin ${email}"
+        oc adm policy add-cluster-role-to-user cluster-admin ${email}
 	echo "##############################################################################################################################"
 done < matricula.txt
 
