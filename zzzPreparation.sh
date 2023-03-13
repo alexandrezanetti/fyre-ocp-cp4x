@@ -8,14 +8,11 @@ pause
 
 echo "Por favor informe seu email:"
 read email
-pause
 
-manager=ldapsearch -x -H ldaps://bluepages.ibm.com:636 -b "c=br,ou=bluepages,o=ibm.com" -s sub "(emailAddress=$email)" | grep "manager: uid="
-pause
+manager=$(ldapsearch -x -H ldaps://bluepages.ibm.com:636 -b "c=br,ou=bluepages,o=ibm.com" -s sub "(emailAddress=$email)" | grep "manager: uid=")
 
 ldapsearch -x -H ldaps://bluepages.ibm.com:636 -b "c=br,ou=bluepages,o=ibm.com" -s sub "(managerSerialNumber=$manager)" | grep "emailAddress:"  | grep -v "BR0\|BR-" | grep "@"
 
-pause
 
 echo "Check your IBM Entitlement Key - https://myibm.ibm.com/products-services/containerlibrary" 
 echo $IBMENTITLEMENTKEY
