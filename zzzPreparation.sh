@@ -24,7 +24,7 @@ echo $manager
 
 #ldapsearch -x -H ldaps://bluepages.ibm.com:636 -b "c=br,ou=bluepages,o=ibm.com" -s sub "(managerSerialNumber=$manager)" | grep "emailAddress:"  | grep -v "BR0\|BR-" | grep "@" | sed "s/emailAddress: //g" > emails.txt
 #cat emails.txt
-ldapsearch -x -LLL -H ldaps://bluepages.ibm.com:636 -b "c=br,ou=bluepages,o=ibm.com" -s sub "(managerSerialNumber=$manager)" dn notesEmail preferredIdentity | sed "s/\/OU=Brazil\/O=IBM@IBMMail//g" | sed "s/CN=//g" >listapessoas.txt
+ldapsearch -x -LLL -H ldaps://bluepages.ibm.com:636 -b "c=br,ou=bluepages,o=ibm.com" -s sub "(managerSerialNumber=$manager)" dn notesEmail preferredIdentity | sed "s/\/OU=Brazil\/O=IBM@IBMMail//g" | sed "s/CN=//g" | sed ':a;N;$!ba;s/\n/;/g' | sed 's/;;/\n/g' >listapessoas.txt
 #cat listapessoas.txt
 #dn: uid=019612631,c=br,ou=bluepages,o=ibm.com
 #notesEmail: Giovanna Paiva
