@@ -4,10 +4,14 @@ echo "###### START - ZZZ SCRIPT - PREPARING OPENSHIFT (OCP) ON FYRE TO INSTALL C
 export START=$(date)
 
 yum install openldap-clients -y
+pause
 
 echo "Por favor informe seu email:"
 read email
+pause
+
 manager=ldapsearch -x -H ldaps://bluepages.ibm.com:636 -b "c=br,ou=bluepages,o=ibm.com" -s sub "(emailAddress=$email)" | grep "manager: uid="
+pause
 
 ldapsearch -x -H ldaps://bluepages.ibm.com:636 -b "c=br,ou=bluepages,o=ibm.com" -s sub "(managerSerialNumber=$manager)" | grep "emailAddress:"  | grep -v "BR0\|BR-" | grep "@"
 
