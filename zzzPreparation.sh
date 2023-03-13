@@ -17,7 +17,7 @@ echo $manager
 #ldapsearch -x -H ldaps://bluepages.ibm.com:636 -b "c=br,ou=bluepages,o=ibm.com" -s sub "(managerSerialNumber=$manager)" | grep "emailAddress:"  | grep -v "BR0\|BR-" | grep "@" | sed "s/emailAddress: //g" > emails.txt
 #cat emails.txt
 ldapsearch -x -LLL -H ldaps://bluepages.ibm.com:636 -b "c=br,ou=bluepages,o=ibm.com" -s sub "(managerSerialNumber=$manager)" dn hrFirstName hrLastName preferredIdentity >listapessoas.txt
-cat 
+cat listapessoas.txt
 #oc get identity
 #oc create user apaes
 #echo -n ""uid=101391631,c=br,ou=bluepages,o=ibm.com"" | base64
