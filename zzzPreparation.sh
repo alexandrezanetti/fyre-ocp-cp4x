@@ -24,14 +24,13 @@ echo $manager
 
 #ldapsearch -x -H ldaps://bluepages.ibm.com:636 -b "c=br,ou=bluepages,o=ibm.com" -s sub "(managerSerialNumber=$manager)" | grep "emailAddress:"  | grep -v "BR0\|BR-" | grep "@" | sed "s/emailAddress: //g" > emails.txt
 #cat emails.txt
-ldapsearch -x -LLL -H ldaps://bluepages.ibm.com:636 -b "c=br,ou=bluepages,o=ibm.com" -s sub "(managerSerialNumber=$manager)" dn hrFirstName hrLastName preferredIdentity >listapessoas.txt
+ldapsearch -x -LLL -H ldaps://bluepages.ibm.com:636 -b "c=br,ou=bluepages,o=ibm.com" -s sub "(managerSerialNumber=$manager)" dn notesEmail preferredIdentity | sed "s/\/OU=Brazil\/O=IBM@IBMMail//g" | sed "s/CN=//g" >listapessoas.txt
 #cat listapessoas.txt
-#dn: uid=015524631,c=br,ou=bluepages,o=ibm.com
-#preferredIdentity: Isabella.Silva@ibm.com
-#hrFirstName: Isabella
-#hrLastName: Ferreira da Silva
+#dn: uid=019612631,c=br,ou=bluepages,o=ibm.com
+#notesEmail: Giovanna Paiva
+#preferredIdentity: gdesideri@ibm.com
 #oc get identity
-#oc create user ${preferredIdentity_listapessoas.txt} --full-name="${hrFirstName_listapessoas.txt} ${hrLastName_listapessoas.txt}" 
+#oc create user ${preferredIdentity_listapessoas.txt} --full-name="${notesEmail_listapessoas.txt}"  
 #identity=$(echo -n "${dn_listapessoas.txt}" | base64)
 #oc create identity ldapauth:$identity
 #oc create useridentitymapping ldapauth:$identity ${preferredIdentity_listapessoas.txt}
