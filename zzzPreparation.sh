@@ -61,6 +61,9 @@ oc apply -f $DIR_CP4X_INST/ibmintranetoauth.yaml
 echo "Install ldapsearch (OpenLdap Client)"
 dnf install -y openldap-clients
 
+manager=$(ldapsearch -x -H ldaps://bluepages.ibm.com:636 -b "c=br,ou=bluepages,o=ibm.com" -s sub "(emailAddress=${email})" | grep "managerSerialNumber: " | cut -c22-27)
+echo $manager
+
 for i in $(ldapsearch -x -LLL -H ldaps://bluepages.ibm.com:636 -b "ou=bluepages,o=ibm.com" "(managerSerialNumber=${manager})" dn | grep "dn" | cut -c5-); do chave=$(echo -n $i | base64 | cut -c1-55); echo "${i};IBM W3 Intranet:${chave}"; done > matricula.txt
 cat matricula.txt
 
