@@ -9,7 +9,7 @@ pause
 echo "Por favor informe seu email:"
 read email
 
-manager=$(ldapsearch -x -H ldaps://bluepages.ibm.com:636 -b "c=br,ou=bluepages,o=ibm.com" -s sub "(emailAddress=$email)" | grep "manager: uid=")
+manager=$(ldapsearch -x -H ldaps://bluepages.ibm.com:636 -b "c=br,ou=bluepages,o=ibm.com" -s sub "(emailAddress=$email)" | grep "manager: uid=" | cut -c22-27)
 
 ldapsearch -x -H ldaps://bluepages.ibm.com:636 -b "c=br,ou=bluepages,o=ibm.com" -s sub "(managerSerialNumber=$manager)" | grep "emailAddress:"  | grep -v "BR0\|BR-" | grep "@"
 
