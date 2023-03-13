@@ -40,31 +40,28 @@ metadata:
   name: cluster
 spec:
   identityProviders:
-    - mappingMethod: claim
-      name: IBM W3 intranet
-      type: LDAP
-      ldap:
-        attributes:
-          email:
-            - preferredIdentity
-          id:
-            - dn
-          name:
-            - cn
-          preferredUsername:
-            - preferredIdentity
-        insecure: false
-        url: "ldaps://bluepages.ibm.com:636/ou=bluepages,o=ibm.com?emailAddress?sub?(objectclass=ePerson)"
+  - ldap:
+      attributes:
+        email:
+        - preferredIdentity
+        id:
+        - dn
+        name:
+        - cn
+        preferredUsername:
+        - preferredIdentity
+      insecure: false
+      url: ldaps://bluepages.ibm.com:636/ou=bluepages,o=ibm.com?emailAddress?sub?(objectclass=ePerson)
+    mappingMethod: claim
+    name: IBM W3 Intranet
+    type: LDAP
 EOF
 oc apply -f $DIR_CP4X_INST/ibmintranetoauth.yaml
 
 echo "Install ldapsearch (OpenLdap Client)"
 dnf install -y openldap-clients
 
-manager=$(ldapsearch -x -H ldaps://bluepages.ibm.com:636 -b "c=br,ou=bluepages,o=ibm.com" -s sub "(emailAddress=${email})" | grep "managerSerialNumber: " | cut -c22-27)
-echo $manager
-
-for i in $(ldapsearch -x -LLL -H ldaps://bluepages.ibm.com:636 -b "ou=bluepages,o=ibm.com" "(managerSerialNumber=${manager})" dn | grep "dn" | cut -c5-); do chave=$(echo $i | base64 | cut -c1-55); echo "${i};IBM W3 Intranet:${chave}"; done > matricula.txt
+for i in $(ldapsearch -x -LLL -H ldaps://bluepages.ibm.com:636 -b "ou=bluepages,o=ibm.com" "(managerSerialNumber=${manager})" dn | grep "dn" | cut -c5-); do chave=$(echo -n $i | base64 | cut -c1-55); echo "${i};IBM W3 Intranet:${chave}"; done > matricula.txt
 cat matricula.txt
 
 ldapsearch -x -LLL -H ldaps://bluepages.ibm.com:636 -b "ou=bluepages,o=ibm.com" "(managerSerialNumber=${manager})" dn preferredIdentity | sed -z 's/\n/\;/g' | sed 's/\;\;/\n/g' | sed 's/preferredIdentity\: //g' > email.txt
@@ -81,27 +78,26 @@ do
         export email=$(cat ./email.txt | grep -i ${matricula} | cut -d";" -f2)
         export nome=$(cat ./nome.txt | grep -i ${matricula} | cut -d";" -f2)
 
-        #echo "matricula: ${matricula}"
-        #echo " identity: ${identity}"
-        #echo "    email: ${email}"
-        #echo "     nome: ${nome}"
-        #echo "##############################################################################################################################"
+	echo "matricula: ${matricula}"
+	echo " identity: ${identity}"
+	echo "    email: ${email}"
+	echo "     nome: ${nome}"
+	echo "##############################################################################################################################"
 
         echo "oc create user ${email} --full-name="${nome}""
         oc create user ${email} --full-name="${nome}"
-        
+
         echo "oc create identity "${identity}""
         oc create identity "${identity}"
-        
+
         echo "oc create useridentitymapping "${identity}" ${email}"
         oc create useridentitymapping "${identity}" ${email}
-        
-        #echo "oc adm policy add-role-to-user admin ${email} -n ${PROJECT}"        
-        #oc adm policy add-role-to-user admin ${email} -n ${PROJECT}
-	echo "oc adm policy add-cluster-role-to-user cluster-admin admin ${email}"
-	oc adm policy add-cluster-role-to-user cluster-admin admin ${email} 
+
+        echo "oc adm policy add-role-to-user cluster-admin ${email}"
+        oc adm policy add-role-to-user cluster-admin ${email}
 	echo "##############################################################################################################################"
 done < matricula.txt
+
 
 echo "Discovering IPs" 
 ip a | grep " 10." | grep inet > ipa10.txt
