@@ -1,5 +1,4 @@
 #!/bin/bash
-clear
 echo "Check your IBM Entitlement Key - https://myibm.ibm.com/products-services/containerlibrary" 
 echo $IBMENTITLEMENTKEY
 if [ ${IBMENTITLEMENTKEY} = "{###PROVIDE_YOUR_IBM_ENTITLEMENT_KEY_HERE###}" ]; then echo "Please provide your IBM Entitlement Key - Check https://myibm.ibm.com/products-services/containerlibrary"; exit 999; fi
@@ -11,6 +10,7 @@ echo $PROJECT
 oc new-project $PROJECT
 oc project $PROJECT
 
+clear
 echo "##############################################"
 echo "##############################################"
 echo "##############################################"
@@ -134,11 +134,6 @@ echo $OCPURLAPI
 echo $OCPADMINUSER
 echo $OCPADMINPASS
 
-### PAREI AQUI!!!
-### PAREI AQUI!!!
-### PAREI AQUI!!!
-### PAREI AQUI!!!
-
 echo $DIR_NFS
 echo $STORAGECLASSNAME
 
@@ -257,6 +252,15 @@ oc create -f toolbox.yaml
 oc patch storageclass rook-ceph-block -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'        
 echo "###### FINISH - ZZZ SCRIPT - PREPARING OPENSHIFT (OCP) ON FYRE TO INSTALL CLOUD PAK FOR X (CP4X)"
 export STOP=$(date)
+clear
+echo "##############################################"
+echo "##############################################"
 echo "###### START: "$START " - STOP: "$STOP" ###### "
+echo "Url da console: $OCPURLCON"
+echo "Url de API Rest: $OCPURLAPI"
+echo "Usuário Admin: $OCPADMINUSER"
+echo "Senha do usuário Admin: $OCPADMINPASS"
+echo "##############################################"
+echo "##############################################"
 
 echo "Contact: alexandre.zanetti@br.ibm.com"
