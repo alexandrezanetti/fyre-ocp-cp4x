@@ -26,6 +26,12 @@ echo $email
 echo "###### START - ZZZ SCRIPT - PREPARING OPENSHIFT (OCP) ON FYRE TO INSTALL CLOUD PAK FOR X (CP4X)"
 export START=$(date)
 
+echo "Creating the installation directory - in general /tmp/cp4x" 
+export DIR_CP4X_INST=/tmp/CP4X
+echo $DIR_CP4X_RWX
+mkdir -p $DIR_CP4X_INST
+chmod a+x $DIR_CP4X_INST
+
 echo "Creating an Oauth for W3"
 cat <<EOF >> $DIR_CP4X_INST/ibmintranetoauth.yaml
 apiVersion: config.openshift.io/v1
@@ -90,14 +96,12 @@ do
         echo "oc create useridentitymapping "${identity}" ${email}"
         oc create useridentitymapping "${identity}" ${email}
         
-        echo "oc adm policy add-role-to-user admin ${email} -n ${PROJECT}"        
-        oc adm policy add-role-to-user admin ${email} -n ${PROJECT}
+        #echo "oc adm policy add-role-to-user admin ${email} -n ${PROJECT}"        
+        #oc adm policy add-role-to-user admin ${email} -n ${PROJECT}
+	echo "oc adm policy add-cluster-role-to-user cluster-admin admin ${email}"
+	oc adm policy add-cluster-role-to-user cluster-admin admin ${email} 
 	echo "##############################################################################################################################"
 done < matricula.txt
-
-echo "Creating the installation directory - in general /tmp/cp4x" 
-export DIR_CP4X_INST=/tmp/CP4X
-echo $DIR_CP4X_RWX
 
 echo "Discovering IPs" 
 ip a | grep " 10." | grep inet > ipa10.txt
@@ -206,7 +210,7 @@ while (oc get machineconfigpool | egrep -v "True      False      False|UPDATED  
 echo "Creating IBM Operator Catalog on Openshift Cluster"
 echo $DIR_CP4X_INST
 mkdir -p $DIR_CP4X_INST
-chmod 777 $DIR_CP4X_INST
+chmod a+x $DIR_CP4X_INST
 cat <<EOF >> $DIR_CP4X_INST/ibmoperator.yaml
 apiVersion: operators.coreos.com/v1alpha1
 kind: CatalogSource
@@ -226,8 +230,6 @@ oc apply -f $DIR_CP4X_INST/ibmoperator.yaml
 
 echo "Creating IBM Operator Group on Openshift Cluster"
 echo $DIR_CP4X_INST
-mkdir -p $DIR_CP4X_INST
-chmod 777 $DIR_CP4X_INST
 cat <<EOF >> $DIR_CP4X_INST/ibmoperatorgroup.yaml
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
