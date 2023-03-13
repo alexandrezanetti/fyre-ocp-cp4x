@@ -1,41 +1,5 @@
-
-
 #!/bin/bash
-echo "###### START - ZZZ SCRIPT - PREPARING OPENSHIFT (OCP) ON FYRE TO INSTALL CLOUD PAK FOR X (CP4X)"
-export START=$(date)
-
-yum install openldap-clients -y
-pause
-
 clear
-echo "##############################################"
-echo "##############################################"
-echo "##############################################"
-echo "##############################################"
-echo "Por favor informe seu email:"
-echo "##############################################"
-echo "##############################################"
-echo "##############################################"
-read email
-echo $email
-
-manager=$(ldapsearch -x -H ldaps://bluepages.ibm.com:636 -b "c=br,ou=bluepages,o=ibm.com" -s sub "(emailAddress=$email)" | grep "managerSerialNumber: " | cut -c22-27)
-echo $manager
-
-#ldapsearch -x -H ldaps://bluepages.ibm.com:636 -b "c=br,ou=bluepages,o=ibm.com" -s sub "(managerSerialNumber=$manager)" | grep "emailAddress:"  | grep -v "BR0\|BR-" | grep "@" | sed "s/emailAddress: //g" > emails.txt
-#cat emails.txt
-ldapsearch -x -LLL -H ldaps://bluepages.ibm.com:636 -b "c=br,ou=bluepages,o=ibm.com" -s sub "(managerSerialNumber=$manager)" dn notesEmail preferredIdentity | sed "s/\/OU=Brazil\/O=IBM@IBMMail//g" | sed "s/CN=//g" | sed ':a;N;$!ba;s/\n/;/g' | sed 's/;;/\n/g' >listapessoas.txt
-#cat listapessoas.txt
-#dn: uid=019612631,c=br,ou=bluepages,o=ibm.com
-#notesEmail: Giovanna Paiva
-#preferredIdentity: gdesideri@ibm.com
-#oc get identity
-#oc create user ${preferredIdentity_listapessoas.txt} --full-name="${notesEmail_listapessoas.txt}"  
-#identity=$(echo -n "${dn_listapessoas.txt}" | base64)
-#oc create identity ldapauth:$identity
-#oc create useridentitymapping ldapauth:$identity ${preferredIdentity_listapessoas.txt}
-#oc adm policy add-role-to-user admin ${preferredIdentity_listapessoas.txt} -n $PROJECT
-
 echo "Check your IBM Entitlement Key - https://myibm.ibm.com/products-services/containerlibrary" 
 echo $IBMENTITLEMENTKEY
 if [ ${IBMENTITLEMENTKEY} = "{###PROVIDE_YOUR_IBM_ENTITLEMENT_KEY_HERE###}" ]; then echo "Please provide your IBM Entitlement Key - Check https://myibm.ibm.com/products-services/containerlibrary"; exit 999; fi
@@ -46,6 +10,90 @@ PROJECT=$(echo $PROJECT | tr A-Z a-z)
 echo $PROJECT
 oc new-project $PROJECT
 oc project $PROJECT
+
+echo "##############################################"
+echo "##############################################"
+echo "##############################################"
+echo "##############################################"
+echo "Por favor informe seu email:"
+echo "##############################################"
+echo "##############################################"
+echo "##############################################"
+read email
+echo $email
+#if [ ${email} = "{###INFORME SEU EMAIL###}" ]; then echo "Please provide your Email"; exit 999; fi
+
+echo "###### START - ZZZ SCRIPT - PREPARING OPENSHIFT (OCP) ON FYRE TO INSTALL CLOUD PAK FOR X (CP4X)"
+export START=$(date)
+
+echo "Creating an Oauth for W3"
+cat <<EOF >> $DIR_CP4X_INST/ibmintranetoauth.yaml
+apiVersion: config.openshift.io/v1
+kind: OAuth
+metadata:
+  name: cluster
+spec:
+  identityProviders:
+    - mappingMethod: claim
+      name: IBM W3 intranet
+      type: LDAP
+      ldap:
+        attributes:
+          email:
+            - emailAddress
+          id:
+            - dn
+          name:
+            - cn
+          preferredUsername:
+            - emailAddress
+        insecure: false
+        url: "ldaps://bluepages.ibm.com:636/ou=bluepages,o=ibm.com?emailAddress?sub?(objectclass=ePerson)"
+EOF
+oc apply -f $DIR_CP4X_INST/ibmintranetoauth.yaml
+
+echo "Install ldapsearch (OpenLdap Client)"
+dnf install -y openldap-clients
+
+manager=$(ldapsearch -x -H ldaps://bluepages.ibm.com:636 -b "c=br,ou=bluepages,o=ibm.com" -s sub "(emailAddress=${email})" | grep "managerSerialNumber: " | cut -c22-27)
+echo $manager
+
+for i in $(ldapsearch -x -LLL -H ldaps://bluepages.ibm.com:636 -b "ou=bluepages,o=ibm.com" "(managerSerialNumber=${manager})" dn | grep "dn" | cut -c5-); do chave=$(echo $i | base64 | cut -c1-55); echo "${i};IBM W3 Intranet:${chave}"; done > matricula.txt
+cat matricula.txt
+
+ldapsearch -x -LLL -H ldaps://bluepages.ibm.com:636 -b "ou=bluepages,o=ibm.com" "(managerSerialNumber=${manager})" dn preferredIdentity | sed -z 's/\n/\;/g' | sed 's/\;\;/\n/g' | sed 's/preferredIdentity\: //g' > email.txt
+cat email.txt
+
+ldapsearch -x -LLL -H ldaps://bluepages.ibm.com:636 -b "ou=bluepages,o=ibm.com" "(managerSerialNumber=${manager})" dn hrFirstName hrLastName | sed -z 's/\n/\;/g' | sed 's/\;\;/\n/g' | sed 's/hrFirstName\: //g' | sed 's/\;hrLastName\: / /g' > nome.txt
+cat nome.txt
+
+while IFS= read -r line #|| [ -n ${line} ]
+do
+	echo "line: ${line}"
+        matricula=$(echo ${line} | cut -c5-13)
+        export identity=$(echo "${line}" | grep -i ${matricula} | cut -d";" -f2)
+        export email=$(cat ./email.txt | grep -i ${matricula} | cut -d";" -f2)
+        export nome=$(cat ./nome.txt | grep -i ${matricula} | cut -d";" -f2)
+
+        #echo "matricula: ${matricula}"
+        #echo " identity: ${identity}"
+        #echo "    email: ${email}"
+        #echo "     nome: ${nome}"
+        #echo "##############################################################################################################################"
+
+        echo "oc create user ${email} --full-name="${nome}""
+        oc create user ${email} --full-name="${nome}"
+        
+        echo "oc create identity "${identity}""
+        oc create identity "${identity}"
+        
+        echo "oc create useridentitymapping "${identity}" ${email}"
+        oc create useridentitymapping "${identity}" ${email}
+        
+        echo "oc adm policy add-role-to-user admin ${email} -n ${PROJECT}"        
+        oc adm policy add-role-to-user admin ${email} -n ${PROJECT}
+	echo "##############################################################################################################################"
+done < matricula.txt
 
 echo "Creating the installation directory - in general /tmp/cp4x" 
 export DIR_CP4X_INST=/tmp/CP4X
@@ -205,34 +253,7 @@ oc create -f filesystem.yaml
 oc create -f ./csi/cephfs/storageclass.yaml
 oc patch storageclass rook-cephfs -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
 oc create -f toolbox.yaml
-oc patch storageclass rook-ceph-block -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
-
-
-cat <<EOF >> $DIR_CP4X_INST/ibmintranetoauth.yaml
-apiVersion: config.openshift.io/v1
-kind: OAuth
-metadata:
-  name: cluster
-spec:
-  identityProviders:
-    - mappingMethod: claim
-      name: IBM W3 intranet login
-      type: LDAP
-      ldap:
-        attributes:
-          email:
-            - emailAddress
-          id:
-            - dn
-          name:
-            - cn
-          preferredUsername:
-            - emailAddress
-        insecure: false
-        url: "ldaps://bluepages.ibm.com:636/ou=bluepages,o=ibm.com?emailAddress?sub?(objectclass=ePerson)"
-EOF
-oc apply -f $DIR_CP4X_INST/ibmintranetoauth.yaml
-        
+oc patch storageclass rook-ceph-block -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'        
 echo "###### FINISH - ZZZ SCRIPT - PREPARING OPENSHIFT (OCP) ON FYRE TO INSTALL CLOUD PAK FOR X (CP4X)"
 export STOP=$(date)
 echo "###### START: "$START " - STOP: "$STOP" ###### "
