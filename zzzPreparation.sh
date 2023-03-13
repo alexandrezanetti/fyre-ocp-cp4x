@@ -46,13 +46,13 @@ spec:
       ldap:
         attributes:
           email:
-            - emailAddress
+            - preferredIdentity
           id:
             - dn
           name:
             - cn
           preferredUsername:
-            - emailAddress
+            - preferredIdentity
         insecure: false
         url: "ldaps://bluepages.ibm.com:636/ou=bluepages,o=ibm.com?emailAddress?sub?(objectclass=ePerson)"
 EOF
