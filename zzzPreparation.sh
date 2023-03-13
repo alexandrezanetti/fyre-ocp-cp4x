@@ -14,8 +14,16 @@ echo $email
 manager=$(ldapsearch -x -H ldaps://bluepages.ibm.com:636 -b "c=br,ou=bluepages,o=ibm.com" -s sub "(emailAddress=$email)" | grep "managerSerialNumber: " | cut -c22-27)
 echo $manager
 
-ldapsearch -x -H ldaps://bluepages.ibm.com:636 -b "c=br,ou=bluepages,o=ibm.com" -s sub "(managerSerialNumber=$manager)" | grep "emailAddress:"  | grep -v "BR0\|BR-" | grep "@" | sed "s/emailAddress: //g" > emails.txt
-cat emails.txt
+#ldapsearch -x -H ldaps://bluepages.ibm.com:636 -b "c=br,ou=bluepages,o=ibm.com" -s sub "(managerSerialNumber=$manager)" | grep "emailAddress:"  | grep -v "BR0\|BR-" | grep "@" | sed "s/emailAddress: //g" > emails.txt
+#cat emails.txt
+ldapsearch -x -LLL -H ldaps://bluepages.ibm.com:636 -b "c=br,ou=bluepages,o=ibm.com" -s sub "(managerSerialNumber=$manager)" dn hrFirstName hrLastName preferredIdentity >listapessoas.txt
+cat 
+#oc get identity
+#oc create user apaes
+#echo -n ""uid=101391631,c=br,ou=bluepages,o=ibm.com"" | base64
+#oc create identity ldapauth:<identity>
+#oc create useridentitymapping ldapauth:<identity> apaes
+#oc adm policy add-role-to-user admin alexandre.zanetti@br.ibm.com -n cp4i
 
 echo "Check your IBM Entitlement Key - https://myibm.ibm.com/products-services/containerlibrary" 
 echo $IBMENTITLEMENTKEY
