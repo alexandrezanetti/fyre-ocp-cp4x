@@ -25,13 +25,17 @@ echo $manager
 #ldapsearch -x -H ldaps://bluepages.ibm.com:636 -b "c=br,ou=bluepages,o=ibm.com" -s sub "(managerSerialNumber=$manager)" | grep "emailAddress:"  | grep -v "BR0\|BR-" | grep "@" | sed "s/emailAddress: //g" > emails.txt
 #cat emails.txt
 ldapsearch -x -LLL -H ldaps://bluepages.ibm.com:636 -b "c=br,ou=bluepages,o=ibm.com" -s sub "(managerSerialNumber=$manager)" dn hrFirstName hrLastName preferredIdentity >listapessoas.txt
-cat listapessoas.txt
+#cat listapessoas.txt
+#dn: uid=015524631,c=br,ou=bluepages,o=ibm.com
+#preferredIdentity: Isabella.Silva@ibm.com
+#hrFirstName: Isabella
+#hrLastName: Ferreira da Silva
 #oc get identity
-#oc create user apaes
-#echo -n ""uid=101391631,c=br,ou=bluepages,o=ibm.com"" | base64
-#oc create identity ldapauth:<identity>
-#oc create useridentitymapping ldapauth:<identity> apaes
-#oc adm policy add-role-to-user admin alexandre.zanetti@br.ibm.com -n cp4i
+#oc create user ${preferredIdentity_listapessoas.txt} --full-name="${hrFirstName_listapessoas.txt} ${hrLastName_listapessoas.txt}" 
+#identity=$(echo -n "${dn_listapessoas.txt}" | base64)
+#oc create identity ldapauth:$identity
+#oc create useridentitymapping ldapauth:$identity ${preferredIdentity_listapessoas.txt}
+#oc adm policy add-role-to-user admin ${preferredIdentity_listapessoas.txt} -n $PROJECT
 
 echo "Check your IBM Entitlement Key - https://myibm.ibm.com/products-services/containerlibrary" 
 echo $IBMENTITLEMENTKEY
